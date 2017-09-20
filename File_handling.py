@@ -7,5 +7,6 @@ def file():
         outfile.write(buffer)
         print('.',end='')
         buffer=infile.read(buffersize)
+        print(buffersize)
     print('Done')
 file()
