@@ -8,5 +8,5 @@ def file():
         print('.',end='')
         buffer=infile.read(buffersize)
         print(buffersize)
-    print('Done')
+    print('Done kl')
 file()
