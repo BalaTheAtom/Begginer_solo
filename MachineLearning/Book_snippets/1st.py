@@ -83,7 +83,48 @@ imputer.fit(housing_num)
 
 X= imputer.transform(housing_num) #it will load the median values
 housing_tr=pd.DataFrame(X,columns=housing_num.columns)
-print(housing_tr.describe())
+# print(housing_tr.describe())
+
+#for non new numeric attributes
+from sklearn.preprocessing import LabelEncoder
+encoder=LabelEncoder()
+housing_cat=housing["ocean_proximity"]
+housing_cat_encoded=encoder.fit_transform(housing_cat)
+# print(encoder.classes_)
+print(housing_cat_encoded)
+from sklearn.preprocessing import OneHotEncoder
+encoder=OneHotEncoder()
+housing_cat_hot=encoder.fit_transform(housing_cat_encoded.reshape(-1,1))
+print(housing_cat_hot.toarray())
+print(housing_cat_hot)
+#the above is directly giving sparse matrix
+from sklearn.preprocessing import LabelBinarizer
+#the above will return direct numpy array
+from sklearn.base import BaseEstimator,TransformerMixin
+rooms_ix, bedrooms_ix, population_ix, household_ix = 3, 4, 5, 6
+class CombinedAttributesAdder(BaseEstimator,TransformerMixin):
+    def __init__(self,add_bedrooms_per_room=True):
+        self.add_bedrooms_per_room=add_bedrooms_per_room
+
+    def fit(self, X, y=None):
+        return self
+        # nothing else to do    
+    def transform(self, X, y=None):
+        rooms_per_household = X[:, rooms_ix] /X[:, household_ix]
+        population_per_household = X[:,population_ix] / X[:, household_ix]
+        if self.add_bedrooms_per_room:
+            bedrooms_per_room = X[:, bedrooms_ix] /X[:,rooms_ix]
+            return np.c_[X, rooms_per_household, population_per_household,bedrooms_per_room]
+            else:
+            return
+        np.c_[X, rooms_per_household, population_per_household]
+        attr_adder = CombinedAttributesAdder(add_bedrooms_per_room=False)
+        housing_extra_attribs = attr_adder.transform(housing.values)
 
 
 
+# from sklearn.pipeline import Pipelineler
+# num_pipeline = Pipeline([('imputer', Imputer(strategy="median")),
+# ('attribs_adder', CombinedAttributesAdder()),('std_scaler', StandardScaler()),])
+# housing_num_tr = num_pipeline.fit_transform(housing_num)
+from sklearn.preprocessing import StandardSca
